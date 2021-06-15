@@ -3,6 +3,13 @@
 The Parts Unlimited backend is Ruby web app written with [Ruby On Rails](https://rubyonrails.org/)
 
 ## Getting started
+Have Ruby version 2.7.0 - utilize rvm for changing or installing versions
+
+Run `bundle install`
+
+Create the Database by running the following commands : 
+1. `rake db:create`
+2. `rake db:migrate`
 
 To start the app use: `rails s` from the backend directory.
 
