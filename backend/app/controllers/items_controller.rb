@@ -61,7 +61,7 @@ class ItemsController < ApplicationController
       render json: {}
     else
       render json: { errors: { item: ['not owned by user'] } }, status: :forbidden
-    end
+    end 
   end
 
   private
