@@ -83,7 +83,9 @@ const Comments = {
 };
 
 const Profile = {
-  follow: username => requests.post(`/profiles/${username}/follow`),
+  follow: username => {console.log("@@@@@@@@@@ username", username) 
+  return requests.post(`/profiles/${username}/follow`)
+},
   get: username => requests.get(`/profiles/${username}`),
   unfollow: username => requests.del(`/profiles/${username}/follow`)
 };
