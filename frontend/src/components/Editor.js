@@ -10,6 +10,7 @@ import {
   EDITOR_PAGE_UNLOADED,
   UPDATE_FIELD_EDITOR
 } from "../constants/actionTypes";
+import {isUrl} from '../helpers/regex'
 
 const mapStateToProps = state => ({
   ...state.editor
@@ -28,13 +29,16 @@ const mapDispatchToProps = dispatch => ({
 class Editor extends React.Component {
   constructor() {
     super();
+    this.state = {errors:{title :false, description:false, image:false, tagList:false}}
 
     const updateFieldEvent = key => ev =>
-      this.props.onUpdateField(key, ev.target.value);
+    this.props.onUpdateField(key, ev.target.value);
     this.changeTitle = updateFieldEvent("title");
     this.changeDescription = updateFieldEvent("description");
     this.changeImage = updateFieldEvent("image");
     this.changeTagInput = updateFieldEvent("tagInput");
+  
+
 
     this.watchForEnter = ev => {
       if (ev.keyCode === 13) {
@@ -47,14 +51,43 @@ class Editor extends React.Component {
       this.props.onRemoveTag(tag);
     };
 
+    this.validateParams = item => {
+      const { title, description, image = "", tagList} = item;
+      const errors = {};
+      if(!title){
+        errors.title = "field required"
+      } 
+      if(!description){
+        errors.description = "field required"
+      } 
+      if(!tagList ){
+        errors.tagList = "field required"
+      } 
+      if( !image){
+        errors.image = "field required"
+      } 
+      if(!isUrl(image)){
+        errors.image = "field requires an url format"
+      }
+      this.setState({errors})
+      return errors;
+    }
+
     this.submitForm = ev => {
+      //Validate fields 
       ev.preventDefault();
+     
       const item = {
         title: this.props.title,
         description: this.props.description,
         image: this.props.image,
         tagList: this.props.tagList
       };
+
+      const errors = this.validateParams(item);
+      console.log("errors", errors)
+
+      if(Object.keys(errors).length > 0) return;
 
       const slug = { slug: this.props.itemSlug };
       const promise = this.props.itemSlug
@@ -87,6 +120,7 @@ class Editor extends React.Component {
   }
 
   render() {
+    const { title, description, image, tagList} = this.state.errors;
     return (
       <div className="editor-page">
         <div className="container page">
@@ -104,7 +138,9 @@ class Editor extends React.Component {
                       value={this.props.title}
                       onChange={this.changeTitle}
                     />
+       
                   </fieldset>
+                  {title && <div className="error">{title}</div>}
 
                   <fieldset className="form-group">
                     <textarea
@@ -114,7 +150,9 @@ class Editor extends React.Component {
                       value={this.props.description}
                       onChange={this.changeDescription}
                     ></textarea>
+                
                   </fieldset>
+                  {description && <div>{description}</div>}
 
                   <fieldset className="form-group">
                     <input
@@ -124,7 +162,9 @@ class Editor extends React.Component {
                       value={this.props.image}
                       onChange={this.changeImage}
                     />
+                     
                   </fieldset>
+                  {image && <div className="error">{image}</div>}
 
                   <fieldset className="form-group">
                     <input
@@ -135,6 +175,7 @@ class Editor extends React.Component {
                       onChange={this.changeTagInput}
                       onKeyUp={this.watchForEnter}
                     />
+                
 
                     <div className="tag-list pt-2">
                       {(this.props.tagList || []).map(tag => {
@@ -152,7 +193,9 @@ class Editor extends React.Component {
                         );
                       })}
                     </div>
+       
                   </fieldset>
+                  {tagList && <div className="error">{tagList}</div>}
 
                   <button
                     className="btn btn-lg pull-xs-right btn-primary"
